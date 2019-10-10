@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:armrci/screens/my_service.dart';
 import 'package:armrci/screens/my_style.dart';
 import 'package:armrci/screens/register.dart';
@@ -13,6 +11,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 // Explicit
+  final formKey = GlobalKey<FormState>();
+  String emailString, passwordString;
 // Method
 
   @override
@@ -22,12 +22,13 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> checkStatus() async {
-    FirebaseAuth firebaseAuth =FirebaseAuth.instance;
-    FirebaseUser firebaseUser =await firebaseAuth.currentUser();
-    if (firebaseUser!=null) {
-      MaterialPageRoute materialPageRoute =MaterialPageRoute(builder: (BuildContext context) => Myservice());
-      Navigator.of(context).pushAndRemoveUntil(materialPageRoute, (Route<dynamic> route)=> false);
-      
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+    if (firebaseUser != null) {
+      MaterialPageRoute materialPageRoute =
+          MaterialPageRoute(builder: (BuildContext context) => Myservice());
+      Navigator.of(context).pushAndRemoveUntil(
+          materialPageRoute, (Route<dynamic> route) => false);
     }
   }
 
@@ -50,8 +51,64 @@ class _HomeState extends State<Home> {
         'Sign In',
         style: TextStyle(color: Colors.white),
       ),
-      onPressed: () {},
+      onPressed: () {
+        formKey.currentState.save();
+        print('email=$emailString,password=$passwordString');
+        checkAuthen();
+      },
     );
+  }
+
+  Future<void> checkAuthen() async {
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    await firebaseAuth
+        .signInWithEmailAndPassword(
+            email: emailString, password: passwordString)
+        .then((response) {
+      MaterialPageRoute materialPageRoute =
+          MaterialPageRoute(builder: (BuildContext context) => Myservice());
+      Navigator.of(context).pushAndRemoveUntil(
+          materialPageRoute, (Route<dynamic> route) => false);
+    }).catchError((response) {
+      String title = response.code;
+      String message = response.message;
+      myAlert(title, message);
+    });
+  }
+
+  Widget showTitle(String title) {
+    return ListTile(
+      leading: Icon(
+        Icons.add_alert,
+        size: 48.0,
+        color: Colors.red,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+            color: Colors.red,
+            fontSize: MyStyle().h2,
+            fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  void myAlert(String title, String message) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: showTitle(title),
+            content: Text(message),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('OK'),onPressed: (){
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 
   Widget showButton() {
@@ -81,6 +138,9 @@ class _HomeState extends State<Home> {
           labelText: 'User :',
           labelStyle: TextStyle(color: MyStyle().textColor),
         ),
+        onSaved: (value) {
+          emailString = value.trim();
+        },
       ),
     );
   }
@@ -98,6 +158,9 @@ class _HomeState extends State<Home> {
           labelText: 'Password :',
           labelStyle: TextStyle(color: MyStyle().textColor),
         ),
+        onSaved: (value) {
+          passwordString = value.trim();
+        },
       ),
     );
   }
@@ -135,18 +198,21 @@ class _HomeState extends State<Home> {
             ),
           ),
           child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                showLogo(),
-                showAppName(),
-                userText(),
-                passwordText(),
-                SizedBox(
-                  height: 8.0,
-                ),
-                showButton(),
-              ],
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  showLogo(),
+                  showAppName(),
+                  userText(),
+                  passwordText(),
+                  SizedBox(
+                    height: 8.0,
+                  ),
+                  showButton(),
+                ],
+              ),
             ),
           ),
         ),
