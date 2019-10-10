@@ -1,3 +1,4 @@
+import 'package:armrci/screens/my_service.dart';
 import 'package:armrci/screens/my_style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -99,12 +100,14 @@ class _RegisterState extends State<Register> {
   Future<void> setUpDisplayName() async {
     FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     await firebaseAuth.currentUser().then((response) {
-      UserUpdateInfo userUpdateInfo =UserUpdateInfo();
+      UserUpdateInfo userUpdateInfo = UserUpdateInfo();
       userUpdateInfo.displayName = nameString;
       response.updateProfile(userUpdateInfo);
 
-
-      
+      MaterialPageRoute materialPageRoute =
+          MaterialPageRoute(builder: (BuildContext context) => Myservice());
+      Navigator.of(context).pushAndRemoveUntil(
+          materialPageRoute, (Route<dynamic> route) => false);
     });
   }
 
