@@ -177,7 +177,7 @@ class _HomeState extends State<Home> {
     return Text(
       'บริษัท รอแยลแคนอินดัสทรีส์ จำกัด',
       style: TextStyle(
-        fontSize: 30.0,
+        fontSize: 20.0,
         fontWeight: FontWeight.bold,
         fontStyle: FontStyle.normal,
         color: Colors.green[300],
