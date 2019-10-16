@@ -1,4 +1,6 @@
+import 'package:armrci/screens/add_product.dart';
 import 'package:armrci/screens/home.dart';
+import 'package:armrci/screens/list_all_product.dart';
 import 'package:armrci/screens/my_style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +12,26 @@ class Myservice extends StatefulWidget {
 
 class _MyserviceState extends State<Myservice> {
 // ExplicitT
+  String loginString = '';
+  Widget currentWidget =ListAllProduct();
 
 // Method
+
+  @override
+  void initState() {
+    super.initState();
+    findDisplayName();
+  }
+
+  Future<void> findDisplayName() async {
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    await firebaseAuth.currentUser().then((response) {
+      setState(() {
+        loginString = response.displayName;
+        print('loginString = $loginString');
+      });
+    });
+  }
 
   Widget myDrawer() {
     return Drawer(
@@ -36,6 +56,11 @@ class _MyserviceState extends State<Myservice> {
       ),
       title: Text('List All Product'),
       subtitle: Text('Show all Product in my Factory'),
+      onTap: (){setState(() {
+       currentWidget = ListAllProduct(); 
+      });
+        Navigator.of(context).pop();
+      },
     );
   }
 
@@ -48,6 +73,11 @@ class _MyserviceState extends State<Myservice> {
       ),
       title: Text('Add Product'),
       subtitle: Text('Show Add Product Page'),
+      onTap: (){setState(() {
+       currentWidget = AddProduct(); 
+      });
+        Navigator.of(context).pop();
+      },
     );
   }
 
@@ -88,7 +118,7 @@ class _MyserviceState extends State<Myservice> {
   }
 
   Widget showLogin() {
-    return Text('Login By');
+    return Text('Login By $loginString');
   }
 
   Widget signOutButton() {
@@ -118,7 +148,7 @@ class _MyserviceState extends State<Myservice> {
         title: Text('My Service'),
         actions: <Widget>[signOutButton()],
       ),
-      body: Text('body'),
+      body: currentWidget,
       drawer: myDrawer(),
     );
   }

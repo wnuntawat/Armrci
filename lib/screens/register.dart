@@ -102,7 +102,9 @@ class _RegisterState extends State<Register> {
     await firebaseAuth.currentUser().then((response) {
       UserUpdateInfo userUpdateInfo = UserUpdateInfo();
       userUpdateInfo.displayName = nameString;
-      response.updateProfile(userUpdateInfo);
+      response.updateProfile(userUpdateInfo).catchError((response){
+        print('error = ===============${response.toString()}');
+      });
 
       MaterialPageRoute materialPageRoute =
           MaterialPageRoute(builder: (BuildContext context) => Myservice());
